@@ -1,18 +1,18 @@
+use egui::ScrollArea;
+
 #[derive(serde::Deserialize, serde::Serialize, PartialEq, Clone)]
 struct Task {
     title: String,
     completed: bool,
     description: String,
-    id: String,
 }
 
 impl Default for Task {
     fn default() -> Self {
         Self {
-            title: "New task".to_string(),
+            title: "".to_string(),
             completed: false,
-            description: "Edit description...".to_string(),
-            id: uuid::Uuid::new_v4().to_string(),
+            description: "".to_string(),
         }
     }
 }
@@ -25,9 +25,7 @@ struct TodoWindow {
 
 impl Default for TodoWindow {
     fn default() -> Self {
-        Self {
-            tasks: vec![],
-        }
+        Self { tasks: vec![] }
     }
 }
 
@@ -56,23 +54,30 @@ impl eframe::App for TodoWindow {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Your tasks");
+            match tasks.len() {
+                0 => ui.heading("No tasks"),
+                1 => ui.heading("1 task"),
+                n => ui.heading(format!("{} tasks", n)),
+            };
+
             ui.separator();
+            ScrollArea::vertical().show(ui, |ui|
             for task in tasks.iter_mut() {
-                ui.horizontal(|ui| {
-                    ui.checkbox(&mut task.completed, "");
-                    ui.add(egui::TextEdit::singleline(&mut task.title));
-                });
+                ui.label("Title");
+                ui.add(egui::TextEdit::singleline(&mut task.title));
+                ui.label("Description");
                 ui.add(egui::TextEdit::multiline(&mut task.description));
+                ui.checkbox(&mut task.completed, "Completed");
                 ui.separator();
-            }
+            })
         });
+    
     }
 }
 
 fn main() {
     let mut native_options = eframe::NativeOptions::default();
-    native_options.initial_window_size = Some(egui::vec2(400.0, 600.0));
+    native_options.initial_window_size = Some(egui::vec2(400.0, 500.0));
     native_options.resizable = false;
     eframe::run_native(
         "Todo",
