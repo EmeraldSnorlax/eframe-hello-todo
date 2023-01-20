@@ -1,10 +1,9 @@
-use egui::TextBuffer;
-
-#[derive(Default, serde::Deserialize, serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize, PartialEq, Clone)]
 struct Task {
     title: String,
     completed: bool,
     description: String,
+    id: String,
 }
 
 impl Default for Task {
@@ -13,6 +12,7 @@ impl Default for Task {
             title: "New task".to_string(),
             completed: false,
             description: "Edit description...".to_string(),
+            id: uuid::Uuid::new_v4().to_string(),
         }
     }
 }
@@ -31,11 +31,13 @@ impl Default for TodoWindow {
                     title: "Task 1".to_string(),
                     completed: false,
                     description: "This is a description".to_string(),
+                    id: Default::default(),
                 },
                 Task {
                     title: "Task 2".to_string(),
                     completed: true,
                     description: "Edit description...".to_string(),
+                    id: Default::default(),
                 },
             ],
         }
@@ -59,8 +61,8 @@ impl eframe::App for TodoWindow {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self { tasks } = self;
+        tasks.retain(|t| !t.completed);
         egui::TopBottomPanel::bottom("bottom_panel").show(ctx, |ui| {
-            // Full width button
             if ui.button("Add task").clicked() {
                 tasks.push(Task::default());
             }
@@ -69,7 +71,7 @@ impl eframe::App for TodoWindow {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Your tasks");
             ui.separator();
-            for task in tasks {
+            for task in tasks.iter_mut() {
                 ui.horizontal(|ui| {
                     ui.checkbox(&mut task.completed, "");
                     ui.add(egui::TextEdit::singleline(&mut task.title));
