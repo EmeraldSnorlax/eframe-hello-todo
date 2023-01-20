@@ -26,20 +26,7 @@ struct TodoWindow {
 impl Default for TodoWindow {
     fn default() -> Self {
         Self {
-            tasks: vec![
-                Task {
-                    title: "Task 1".to_string(),
-                    completed: false,
-                    description: "This is a description".to_string(),
-                    id: Default::default(),
-                },
-                Task {
-                    title: "Task 2".to_string(),
-                    completed: true,
-                    description: "Edit description...".to_string(),
-                    id: Default::default(),
-                },
-            ],
+            tasks: vec![],
         }
     }
 }
