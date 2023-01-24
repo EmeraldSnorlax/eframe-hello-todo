@@ -71,7 +71,6 @@ impl eframe::App for TodoWindow {
                 ui.separator();
             })
         });
-    
     }
 }
 
